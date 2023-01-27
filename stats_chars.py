@@ -1,4 +1,21 @@
 import mysql.connector
+import subprocess
+
+m = '''
+   ======================== Tibia Char Stats =======================\n\
+   1) Get Chars
+   2) Insert Characters
+   x) Exit
+'''
+
+def menu(m, flag):
+   print(m)
+   option = str(input('> '))
+   if option == 'x':
+      print('[-] Goodbye!')
+      flag = False
+   subprocess.call('clear')
+   return option, flag
 
 def connection(host, user, password, database, port):
    mydb = mysql.connector.connect(
@@ -20,7 +37,8 @@ def insert_stats(stats):
       values.append(res)
    return values 
 
-def insert_char(stats, values, mydb, cursor):
+def insert_char(stats, mydb, cursor):
+   values = insert_stats(stats)
    stat = ''
    val = ''
    val = ', '.join(['%s'] * len(values))
@@ -35,14 +53,18 @@ def get_chars(mydb, cursor):
    result = cursor.fetchall()
    return result
 
-stats = ["first_name", "shielding", "magic_level", "sword", "axe", "distance"]
-values = insert_stats(stats)
-print(values)
 mydb, cursor = connection('localhost', 'tibia', 'tibia123', 'tibia', '3309')
-insert_char(stats, values, mydb, cursor)
-result = get_chars(mydb, cursor)
-print(result)
+stats = ["first_name", "shielding", "magic_level", "sword", "axe", "distance"]
+
+flag = True
+while flag:
+   opt, flag = menu(m, flag)
+   if opt == '1':
+      result = get_chars(mydb, cursor)
+      print(result)
+   elif opt == '2':   
+      insert_char(stats, mydb, cursor)
+
 
 #cursor.execute('show create table characters')
-#resultado = cursor.fetchall()
 #print(resultado)
